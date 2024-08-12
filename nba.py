@@ -1,6 +1,6 @@
 #! python3
 # Command to run script: 
-# python nba.py [ContextMeasure (FGM/FG3M/AST)] [PlayerID] [Season] [SeasonType (Regular Season/Playoffs)] [GameID (optional)]
+# python nba.py [ContextMeasure (FGM/FG3M/AST)] [PlayerID] [Season] [SeasonType (Regular%20Season/Playoffs)] [GameID (optional)] [Play Type (ex. Dunk) (optional)]
 
 import sys, os, requests, time
 from selenium import webdriver
@@ -8,20 +8,44 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 
-# Variables for CMDL Arguments
+# Mandatory arguments
 context_measure = sys.argv[1]
 player_id = sys.argv[2]
 season = sys.argv[3]
 season_type = sys.argv[4]
 
-# If 5 cmdl args, then searching for a season (not including game_id)
-if len(sys.argv) == 5:
-    page_url = 'https://www.nba.com/stats/events?CFID=&CFPARAMS=&ContextMeasure='+context_measure+'&GameID=&PlayerID='+player_id+'&Season='+season+'&SeasonType='+season_type+'&TeamID=&flag=3&sct=plot&section=game'
+# Optional arguments
+game_id = None
+play_type = None
 
-# If 6 cmdl args, then searching for a particular game (including game_id)
-elif len(sys.argv) == 6:
-    game_id = sys.argv[5]
-    page_url = 'https://www.nba.com/stats/events?CFID=&CFPARAMS=&ContextMeasure='+context_measure+'&GameID='+game_id+'&PlayerID='+player_id+'&Season='+season+'&SeasonType='+season_type+'&TeamID=&flag=3&sct=plot&section=game'
+# Helper function to check if a string is numeric
+def is_numeric(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+# Determine which optional arguments are provided
+if len(sys.argv) == 6:
+    if is_numeric(sys.argv[5]):  # Check if the 5th argument is numeric (game_id)
+        game_id = sys.argv[5]
+    else:  # Otherwise, treat it as play_type
+        play_type = sys.argv[5]
+elif len(sys.argv) == 7: # If both optional arguments are provided
+        game_id = sys.argv[5]
+        play_type = sys.argv[6]
+
+# Construct the URL based on the presence of optional arguments
+if game_id and play_type:
+    page_url = f'https://www.nba.com/stats/events?CF=ACTION_TYPE*E*{play_type}&CFID=&CFPARAMS=&ContextMeasure={context_measure}&GameID={game_id}&PlayerID={player_id}&Season={season}&SeasonType={season_type}&TeamID=&flag=3&sct=plot&section=game'
+elif game_id:
+    page_url = f'https://www.nba.com/stats/events?CFID=&CFPARAMS=&ContextMeasure={context_measure}&GameID={game_id}&PlayerID={player_id}&Season={season}&SeasonType={season_type}&TeamID=&flag=3&sct=plot&section=game'
+elif play_type:
+    page_url = f'https://www.nba.com/stats/events?CF=ACTION_TYPE*E*{play_type}&CFID=&CFPARAMS=&ContextMeasure={context_measure}&GameID=&PlayerID={player_id}&Season={season}&SeasonType={season_type}&TeamID=&flag=3&sct=plot&section=game'
+else:
+    page_url = f'https://www.nba.com/stats/events?CFID=&CFPARAMS=&ContextMeasure={context_measure}&GameID=&PlayerID={player_id}&Season={season}&SeasonType={season_type}&TeamID=&flag=3&sct=plot&section=game'
+
 
 os.makedirs('clips', exist_ok=True) # Create directory to store downloaded clips in
 clips_folder = 'clips'
@@ -95,6 +119,8 @@ for x in next_videos:
     name_counter+=1
     video_counter+=1
     time.sleep(3)
+
+browser.close()
 
 # Concatenate clips into one final video
 
