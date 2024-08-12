@@ -3,6 +3,8 @@
 import sys, os, requests, time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from moviepy.editor import VideoFileClip, concatenate_videoclips
+
 
 # Variables for CMDL Arguments
 context_measure = sys.argv[1]
@@ -19,7 +21,8 @@ elif len(sys.argv) == 6:
     game_id = sys.argv[5]
     page_url = 'https://www.nba.com/stats/events?CFID=&CFPARAMS=&ContextMeasure='+context_measure+'&GameID='+game_id+'&PlayerID='+player_id+'&Season='+season+'&SeasonType='+season_type+'&TeamID=&flag=3&sct=plot&section=game'
 
-os.makedirs('clips', exist_ok=True) # Store clips in /clips
+os.makedirs('clips', exist_ok=True) # Create directory to store downloaded clips in
+clips_folder = 'clips'
 
 # Open chrome browser and navigate to the appropriate URL.
 browser = webdriver.Chrome()
@@ -72,4 +75,20 @@ for x in next_videos:
 
     name_counter+=1
     video_counter+=1
-    time.sleep(2)
+    time.sleep(1)
+
+# Concatenate clips into one final video
+
+# List that will contain the clips
+video_clips = []
+
+for filename in (os.listdir(clips_folder)):
+    if filename.endswith(('.mp4')): 
+        clip_path = os.path.join(clips_folder, filename)
+        video_clips.append(VideoFileClip(clip_path))
+
+# Concatenate the video clips
+final_clip = concatenate_videoclips(video_clips)
+
+# Save the concatenated video
+final_clip.write_videofile("output\completed_video.mp4")
