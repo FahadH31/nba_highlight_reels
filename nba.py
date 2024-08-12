@@ -1,10 +1,12 @@
 #! python3
-# [ContextMeasure (FGM/FG3M)] [PlayerID] [Season] [SeasonType (Regular Season/Playoffs)] [GameID]
+# Command to run script: 
+# python nba.py [ContextMeasure (FGM/FG3M/AST)] [PlayerID] [Season] [SeasonType (Regular Season/Playoffs)] [GameID (optional)]
+
 import sys, os, requests, time
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from moviepy.editor import VideoFileClip, concatenate_videoclips
-
 
 # Variables for CMDL Arguments
 context_measure = sys.argv[1]
@@ -33,9 +35,26 @@ time.sleep(5) # Wait for the page to load
 close_popup_element = browser.find_element(By.ID, 'onetrust-reject-all-handler')
 close_popup_element.click()
 
-# Scroll down by 800 pixels (to make the clips clickable)
-browser.execute_script("window.scrollBy(0, 800)")  
+# Scroll down by 700 pixels (to make the clips clickable)
+browser.execute_script("window.scrollBy(0, 700)")  
 next_videos = browser.find_elements(By.CLASS_NAME, 'Crom_stickyRank__aN66p') # Get list of all clips on the page
+
+# When applicable, change the filer option to display multiple pages of clips on one page.
+try:
+    # Attempt to find the dropdown element
+    page_dropdown = browser.find_element(By.CLASS_NAME, 'DropDown_select__4pIg9')
+    
+    # Use the Select class to interact with the dropdown
+    select = Select(page_dropdown)
+        
+    try:
+        # Select the option by value
+        select.select_by_value('-1')  # This will select the option <option value="-1">All</option>
+    except:
+        print("The 'All' option was not found.")
+except:
+    print("Dropdown element not found.")
+
 
 # Initial counter values
 video_counter = 1 
@@ -75,20 +94,18 @@ for x in next_videos:
 
     name_counter+=1
     video_counter+=1
-    time.sleep(1)
+    time.sleep(3)
 
 # Concatenate clips into one final video
 
-# List that will contain the clips
 video_clips = []
 
+# Load clips into the list
 for filename in (os.listdir(clips_folder)):
     if filename.endswith(('.mp4')): 
         clip_path = os.path.join(clips_folder, filename)
         video_clips.append(VideoFileClip(clip_path))
 
-# Concatenate the video clips
+# Concatenate and save the final video
 final_clip = concatenate_videoclips(video_clips)
-
-# Save the concatenated video
 final_clip.write_videofile("output\completed_video.mp4")
