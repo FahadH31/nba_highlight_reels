@@ -9,10 +9,10 @@ A command-line script that generates highlight reels for NBA players from game c
 
 ## Usage
 
-The following arguments must be provided when executing the script from the command line:
+The following arguments must be provided when executing the script:
 
 1. **Context Measure:** Specify the statistic to base the highlight reel on (e.g., `FGM`, `FG3M`, `AST`, `REB`).
-2. **Player ID:** The unique ID of the NBA player.
+2. **Player ID:** The unique ID of the NBA player (obtain from [nba.com/stats](https://www.nba.com/stats)).
 3. **Season:** The NBA season in the format `YYYY-YY` (e.g., `2023-24`).
 4. **Season Type:** The type of season (`Preseason`, `Regular Season`, or `Playoffs`).
 5. **Game ID** (optional): A Game ID to generate highlights from a particular game, rather than an entire season.
@@ -23,4 +23,4 @@ The following arguments must be provided when executing the script from the comm
 - This command generates a video that displays all of the field-goals-made for Lebron James in the 2023-24 Playoffs.
 
 ## Additional Info
-- The full lists of Context Measures, Player IDs, Game IDs, and Play Types can all be found on nba.com/stats.
+- The full lists of possible options for `Context Measures`, `Player IDs`, `Game IDs`, and `Play Types` can all be found on [nba.com/stats](https://www.nba.com/stats).
