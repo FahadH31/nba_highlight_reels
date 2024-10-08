@@ -19,7 +19,7 @@ The following arguments must be provided when executing the script:
 6. **Play Type** (optional): A play type to select clips from (e.g., `Dunk`, `Jumpshot`, `Layup`, etc.).
 
 ## Example Command
-- python nba.py FGM 2544 2023-24 Playoffs
+- `python nba.py FGM 2544 2023-24 Playoffs`
 - This command generates a video that displays all of the field-goals-made for Lebron James in the 2023-24 Playoffs.
 
 ## Additional Info
