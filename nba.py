@@ -6,7 +6,7 @@ import sys, os, requests, time
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
-from moviepy.editor import VideoFileClip, concatenate_videoclips
+from moviepy import VideoFileClip, concatenate_videoclips
 
 # Mandatory arguments
 context_measure = sys.argv[1]
@@ -126,11 +126,17 @@ browser.close()
 
 video_clips = []
 
+# Sort filenames numerically based on their numeric portion
+file_list = sorted(
+    [f for f in os.listdir(clips_folder) if f.endswith('.mp4')],
+    key=lambda x: int(x.split('_')[-1].split('.')[0])
+)
+
 # Load clips into the list
-for filename in (os.listdir(clips_folder)):
-    if filename.endswith(('.mp4')): 
-        clip_path = os.path.join(clips_folder, filename)
-        video_clips.append(VideoFileClip(clip_path))
+for filename in file_list:
+    clip_path = os.path.join(clips_folder, filename)
+    video_clips.append(VideoFileClip(clip_path))
+
 
 # Concatenate and save the final video
 final_clip = concatenate_videoclips(video_clips)
